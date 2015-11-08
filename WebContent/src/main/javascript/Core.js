@@ -321,7 +321,7 @@ var O = {};
 			}
 		}
 		
-		nmSp[name] = function(){
+		nmSp[name] = function(objCfg){
 			var me = this;
 			if(extend && O.isString(extend)){
 				var parentCls = O.getRegistType(extend);
@@ -335,7 +335,7 @@ var O = {};
 				me.extend = extend;
 			}
 			me.typeName = typeName;
-			clsBody.call(me);
+			clsBody.call(me, objCfg);
 			if(intfces){
 				if(! O.isArray(intfces))
 					throw O.createError("SYS_DEFINE_000009", me.typeName);
@@ -450,7 +450,7 @@ var O = {};
 		function regLogMethod(methodName){
 			if(window.console){
 				o.io.Logger[methodName] = function(msg){
-					window.console[methodName](msg);
+					window.console[methodName]('[{0}]{1}'.formatValue(methodName,msg));
 				}
 			}
 		};
@@ -563,11 +563,45 @@ var O = {};
 			sendXHR(readyJson);
 		};
 		
-		o.util.Ajax.loadScript  = function(jsSrc){};
+		o.util.Ajax.loadScript  = function(jsSrc){
+			o.util.Ajax.request({
+				method : 'get',
+				type : 'text',
+				async : false,
+				url : jsSrc,
+				success : function(scriptText){
+					if(window.eval){
+						try{
+							window.eval(scriptText);
+							o.io.Logger.info('{0} [load complete]'.formatValue(jsSrc));
+						}catch(e){
+							o.io.Logger.error('{0} load error'.formatValue(jsSrc));
+						}
+					}
+				},
+				failure : function(failureText){	}
+			});
+		};
 		
-		o.util.Ajax.doPost = function(url, params, callBack){};
+		o.util.Ajax.doPost = function(url, param, callBack){
+			o.util.Ajax.request({
+				url : url,
+				method : 'post',
+				param : param,
+				async : true,
+				success : callBack
+			});
+		};
 		
-		o.util.Ajax.doGet = function(url, params, callBack){};
+		o.util.Ajax.doGet = function(url, param, callBack){
+			o.util.Ajax.request({
+				url : url,
+				method : 'get',
+				param : param,
+				async : true,
+				success : callBack
+			});
+		};
 		
 	});
 	

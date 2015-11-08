@@ -36,18 +36,18 @@ o.util.DemoClass.prototype = {
 O.Class({
 	pkg : 'o.util',
 	extend : 'o.util.DemoClass'
-}, "DemoSubClass", function(){
+}, "DemoSubClass", function(config){
 	var me = this;
+	
+	alert(config);
+	o.io.Logger.info(config);
 	me.getUserInfo = function(){
-		alert(1111111111);
 		me.superClass.getUserInfo();
 	};
 });
 
 alert("This is a {1}".formatValue("wangxh",'2','1','3'));
 
-var objSub = new o.util.DemoSubClass();
-objSub.getUserInfo();
-objSub.sayHello();
-alert(O.isInstanceOf(objSub, "o.util.IUser"));
-o.util.DemoClass.staticFunc();
+var objSub = O.create('o.util.DemoSubClass', {
+	property : 12345
+});

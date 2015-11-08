@@ -105,9 +105,7 @@
 	var d = {
 		name : 'superman'
 	};
-	
 	var f = O.clone(d);
-	
 	o.util.Ajax.request({
 		param : {
 			userName : 'Superman',
@@ -124,4 +122,6 @@
 		}
 	});
 	
+	o.util.Ajax.loadScript('../../javascript/DemoClass.js');
+	alert('------------------------------');
 })();
