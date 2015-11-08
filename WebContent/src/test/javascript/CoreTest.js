@@ -89,7 +89,7 @@
 	});
 	
 	
-	var objA = new o.test.A();
+	/*var objA = new o.test.A();
 	objA.sayHello();
 //	alert(objA.typeName);
 	var objB = new o.test.B();
@@ -100,13 +100,28 @@
 //	alert(objB.typeName);
 	var c = new o.test.B();
 	o.io.Logger.info(c);
-	alert("c : " + c.getName() + "," + c.getAge());
+	alert("c : " + c.getName() + "," + c.getAge());*/
 	
 	var d = {
 		name : 'superman'
 	};
 	
 	var f = O.clone(d);
-	o.io.Logger.info(f);
+	
+	o.util.Ajax.request({
+		param : {
+			userName : 'Superman',
+			age : 19
+		},
+		url : '/OJS/TestJsonData',
+		type : 'text',
+		method : 'post',
+		success : function(response){
+			alert(response);
+		},
+		failure : function(response){
+			alert(response);
+		}
+	});
 	
 })();
