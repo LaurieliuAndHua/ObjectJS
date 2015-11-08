@@ -123,8 +123,9 @@ var O = {};
 	O.registNewError = function(errorCode, msgStrObj){
 		var errFmtStr = EXCEPTION_MSG_MAP[errorCode];
 		if(errFmtStr)
-			throw O.createError('SYS_DEFINE_000002', 'SYS.DEFINE.000002');
+			return false;
 		EXCEPTION_MSG_MAP[errorCode] = msgStrObj;
+		return true;
 	};
 	
 	O.getRegistType = function(typeFullName){
@@ -410,7 +411,7 @@ var O = {};
 				clsArgCfg = clsBodyOrCfg;
 			retObj = new module(clsArgCfg);
 		}else if(O.isInterface(module)){
-			var tmpClsName = O.hashCode(clsBodyOrCfg) + name;
+			var tmpClsName = O.hashCode(clsBodyOrCfg) + moduleName;
 			module = O.Class({
 				pkg : module.pkg,
 				interfaces : [moduleName]
@@ -418,6 +419,14 @@ var O = {};
 			retObj = new module(cfg);
 		}
 		return retObj;
+	};
+	
+	O.isBoolean = function(inData){
+		return typeof(inData) === 'boolean';
+	};
+	
+	O.isObject = function(obj){
+		return typeof(obj) === 'object';
 	};
 	
 	O.hashCode = function(obj){
@@ -430,6 +439,8 @@ var O = {};
 		}
 		return hashCode;
 	};
+	
+	O.emptyFun = function(){};
 	
 	initSystem();
 	
@@ -452,12 +463,123 @@ var O = {};
 	O.Class({
 		pkg : 'o.util'
 	}, "Ajax", function(){
-		o.util.Ajax.request = function(json){};
+		O.registNewError('AJAX.001', {
+			cn : '您的浏览器可能过于陈旧了，不支持 AJAX 功能哦，建议使用现代浏览器以改善您的使用体验，例如 Chrome',
+			en : 'Your Internet Brownser dos\'t surpport AJAX. '
+		});
+		
+		var createXHR = function (){
+			if(XMLHttpRequest){
+				createXHR = function(){
+					return new XMLHttpRequest();
+				};
+				return createXHR();
+			}else if(ActiveXObject){
+				createXHR = function(){
+					return new ActiveXObject("Microsoft.XMLHTTP");
+				};
+				return createXHR();
+			}else{
+				throw O.createError('AJAX.001');
+			}
+		}
+		
+		function prepareResponse(xhr, type){
+			var responseText = xhr.responseText;
+			if(type === 'json'){
+				var tempFunc = new Function(' var tmpObj = {0}; return tmpObj;'.formatValue(responseText));
+				return tempFunc();
+			}
+			if(type === 'text')
+				return responseText;
+			if(type === 'xml'){
+				if(xhr.responseXML)
+					return xhr.responseXML;
+				var divMsg = document.createElement('div');
+				divMsg.innerHTML = xhr.responseText;
+				return divMsg;
+			}
+			return responseText;
+		}
+		
+		function prepareParam(param){
+			var tmpArray = [];
+			for(var p in param){
+				if(O.isObject(param[p])){
+					for(var pp in param[p]){
+						var str = '{0}.{1}={2}'.formatValue(p, pp, param[p][pp]);
+						tmpArray.push(str);
+					}
+				}else{
+					var str = '{0}={1}'.formatValue(p, param[p]);
+					tmpArray.push(str);
+				}
+			}
+			return tmpArray.join("&");
+		}
+		
+		function sendXHR(json){
+			var xhr = createXHR();
+			var method = json['method'], url = json['url'], async = json['async'], type = json['type'];
+			var success = json['success'], failure = json['failure'], param = json['param'], onBeforeSend = json['onBeforeSend'];
+			var paramStr = prepareParam(param);
+			if(method === 'GET' && paramStr){
+				url = '{0}?{1}'.formatValue(url, paramStr);
+			}
+			xhr.open(json.method, url, async);
+			xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+			xhr.onreadystatechange = function(){
+				if(xhr.readyState == 4){
+					if(xhr.status >= 200 && xhr.status <= 300){
+						if(O.isFunction(success))
+							success(prepareResponse(xhr, type));
+					}else{
+						if(O.isFunction(failure))
+							failure(prepareResponse(xhr, type));
+					}
+				}
+			};
+			if(O.isFunction(onBeforeSend)){
+				onBeforeSend();
+			}
+			xhr.send(paramStr);
+		}
+		
+		function prepareJson(json){
+			var retJson = {};
+			retJson.method = O.isString(json['method']) ? json['method'].toUpperCase() : 'GET';
+			retJson.url = O.isString(json['url']) ? json['url'] : '';
+			retJson.async = O.isBoolean(json['async']) ? json['async'] : true;
+			retJson.param = O.isObject(json['param']) ? json['param'] : {};
+			retJson.success = O.isFunction(json['success']) ? json['success'] : O.emptyFun;
+			retJson.failure = O.isFunction(json['failure']) ? json['failure'] : O.emptyFun;
+			retJson.onBeforeSend = O.isFunction(json['onBeforeSend']) ? json['onBeforeSend'] : O.emptyFun;
+			retJson.type = O.isString(json['type']) ? json['type'].toLowerCase () : 'text';
+			return retJson;
+		}
+		
+		o.util.Ajax.request = function(json){
+			var readyJson = prepareJson(json);
+			sendXHR(readyJson);
+		};
 		
 		o.util.Ajax.loadScript  = function(jsSrc){};
 		
 		o.util.Ajax.doPost = function(url, params, callBack){};
 		
 		o.util.Ajax.doGet = function(url, params, callBack){};
+		
+	});
+	
+	O.Class({
+		pkg : 'o.util'
+	}, "SeqAjax", function(){
+		o.util.SeqAjax.pushRequest = function(seqName, json){
+			
+		};
+		
+		o.util.SeqAjax.doRequest = function(seqName){
+			
+		};
 	});
 })();
