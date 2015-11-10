@@ -106,7 +106,7 @@
 		name : 'superman'
 	};
 	var f = O.clone(d);
-	o.util.Ajax.request({
+	/*o.util.Ajax.request({
 		param : {
 			userName : 'Superman',
 			age : 19
@@ -120,8 +120,7 @@
 		failure : function(response){
 			alert(response);
 		}
-	});
+	});*/
 	
 	o.util.Ajax.loadScript('../../javascript/DemoClass.js');
-	alert('------------------------------');
 })();

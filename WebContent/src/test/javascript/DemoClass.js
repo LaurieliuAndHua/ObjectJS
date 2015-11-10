@@ -38,16 +38,41 @@ O.Class({
 	extend : 'o.util.DemoClass'
 }, "DemoSubClass", function(config){
 	var me = this;
-	
-	alert(config);
 	o.io.Logger.info(config);
 	me.getUserInfo = function(){
 		me.superClass.getUserInfo();
 	};
 });
 
-alert("This is a {1}".formatValue("wangxh",'2','1','3'));
-
-var objSub = O.create('o.util.DemoSubClass', {
+var objSub = O.create('o.util.IUser', function(config){
+	var me = this;
+	
+	me.getUserInfo = function(){
+		return config.property;
+	};
+	
+	me.createUserInfo = function(){
+		
+	};
+},{
 	property : 12345
 });
+
+alert(objSub.getUserInfo());
+
+var reqeustSeq = new o.util.SeqAjax();
+reqeustSeq.pushRequest();
+
+reqeustSeq.pushRequest([{
+	url : './testJson.json',
+	type : 'json',
+	success : function(responseJson){
+		alert("1   " + responseJson);
+	}
+},{
+	url : './testJson.json',
+	type : 'json',
+	success : function(responseJson){
+		alert("2   " + responseJson);
+	}
+}]).doRequest();

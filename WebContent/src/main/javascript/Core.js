@@ -327,7 +327,7 @@ var O = {};
 				var parentCls = O.getRegistType(extend);
 				if(! O.isFunction(parentCls))
 					throw O.createError("SYS_DEFINE_000008", extend);
-				var tmpObj = new parentCls();
+				var tmpObj = new parentCls(objCfg);
 				for(var p in tmpObj){
 					me[p] = tmpObj[p];
 				}
@@ -335,6 +335,7 @@ var O = {};
 				me.extend = extend;
 			}
 			me.typeName = typeName;
+			me.name = name;
 			clsBody.call(me, objCfg);
 			if(intfces){
 				if(! O.isArray(intfces))
@@ -348,7 +349,7 @@ var O = {};
 			nmSp[name].typeName = typeName;
 		if(extend)
 			nmSp[name].extend = extend;
-		
+		nmSp[name].name = name;
 		if(intfces){
 			if(! O.isArray(intfces))
 				throw O.createError("SYS_DEFINE_000009", nmSp[name].typeName);
@@ -411,7 +412,7 @@ var O = {};
 				clsArgCfg = clsBodyOrCfg;
 			retObj = new module(clsArgCfg);
 		}else if(O.isInterface(module)){
-			var tmpClsName = O.hashCode(clsBodyOrCfg) + moduleName;
+			var tmpClsName = module.name + O.hashCode(clsBodyOrCfg);
 			module = O.Class({
 				pkg : module.pkg,
 				interfaces : [moduleName]
@@ -450,7 +451,7 @@ var O = {};
 		function regLogMethod(methodName){
 			if(window.console){
 				o.io.Logger[methodName] = function(msg){
-					window.console[methodName]('[{0}]{1}'.formatValue(methodName,msg));
+					window.console[methodName]('[{0}] {1}'.formatValue(methodName, msg));
 				}
 			}
 		};
@@ -576,6 +577,7 @@ var O = {};
 							o.io.Logger.info('{0} [load complete]'.formatValue(jsSrc));
 						}catch(e){
 							o.io.Logger.error('{0} load error'.formatValue(jsSrc));
+							throw e;
 						}
 					}
 				},
@@ -608,12 +610,41 @@ var O = {};
 	O.Class({
 		pkg : 'o.util'
 	}, "SeqAjax", function(){
-		o.util.SeqAjax.pushRequest = function(seqName, json){
-			
+		var me = this;
+		var priv = {
+			requestSeq : new Array()
 		};
-		
-		o.util.SeqAjax.doRequest = function(seqName){
-			
+		me.pushRequest = function(requestJson){
+			if(O.isArray(requestJson)){
+				for(var i = 0; i < requestJson.length; i++){
+					priv.requestSeq[i] = requestJson[i];
+				}
+			}else
+				priv.requestSeq.push(requestJson);
+			return me;
 		};
+		me.clearRequest = function(){
+			priv.requestSeq = new Array();
+			return me;
+		};
+		me.doRequest = function(){
+			callNextReq(priv.requestSeq, 0);
+			return me;
+		};
+		function callNextReq(seqReqArray, seqIndex){
+			if(seqIndex >= seqReqArray.length)
+				return;
+			var reqJson = seqReqArray[seqIndex];
+			if(! reqJson)
+				callNextReq(seqReqArray, seqIndex + 1) ;
+			var tmpSucess = reqJson.success;
+			reqJson.success = function(response){
+				if(O.isFunction(tmpSucess))
+					tmpSucess(response);
+				if(seqIndex < seqReqArray.length)
+					callNextReq(seqReqArray, seqIndex + 1);
+			};
+			o.util.Ajax.request(reqJson);
+		}
 	});
 })();
