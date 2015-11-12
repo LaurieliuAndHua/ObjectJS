@@ -122,5 +122,27 @@
 		}
 	});*/
 	
-	o.util.Ajax.loadScript('../../javascript/DemoClass.js');
+	O.init({
+		classPath : '../../../main/javascript'
+	});
+	O.importModule(['o.data.IStore', 'o.data.IStore']);
+	
+	O.create('o.data.IStore', function(){
+		var me = this;
+		
+		me.getCount = function(){};
+		
+		me.getAt = function(){};
+		
+		me.removeAt = function(){};
+		
+		me.add  = function(){};
+		
+		me.clear = function(){};
+		
+		me.load = function(){};
+		
+		me.init = function(){};
+	})
+//	o.util.Ajax.loadScript('../../javascript/DemoClass.js');
 })();

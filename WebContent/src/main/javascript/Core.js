@@ -87,8 +87,12 @@ var O = {};
 	
 	O.init = function(config){
 		var cfg = config || {};
-		sClassPath = cfg.sClassPath;
-		sLanguage = cfg.sLanguage || 'cn';
+		sClassPath = cfg.classPath;
+		sLanguage = cfg.language || 'cn';
+	};
+	
+	O.getClassPath = function(){
+		return sClassPath;
 	};
 	
 	/**
@@ -169,7 +173,6 @@ var O = {};
 		var name = cfg.name;
 		var methods = cfg.methods;
 		var nmSp = preTypeDefineConfig(pkg, name);
-		var imports = cfg.imports;
 		
 		if(nmSp[name])
 			throw O.createError('SYS_DEFINE_000004', name, pkg);
@@ -306,7 +309,6 @@ var O = {};
 		var extend = preCfg.extend;
 		var intfces = preCfg.interfaces || [];
 		var pkg = preCfg.pkg;
-		var imports = preCfg.imports;
 		var nmSp = preTypeDefineConfig(pkg, name);
 		var typeName = name;
 		if(pkg)
@@ -314,12 +316,6 @@ var O = {};
 		
 		if(! O.isFunction(clsBody))
 			throw O.createError("SYS_DEFINE_000007", typeName);
-		
-		if(imports && O.isArray(imports)){
-			for(var i = 0; i < imports.length; i++){
-				O.importModule(imports[i]);
-			}
-		}
 		
 		nmSp[name] = function(objCfg){
 			var me = this;
@@ -399,8 +395,24 @@ var O = {};
 		return false;
 	};
 	
-	O.importModule = function(moduleName){
-		
+	O.importModule = function(moduleNameorModuleNames){
+		function loadOneModule(moduleName){
+			try{
+				O.getRegistType(moduleName);
+			}catch(e){
+				var scriptSrc = moduleName.replace(/\./g, "/");
+				scriptSrc = "{0}/{1}.js".formatValue(sClassPath, scriptSrc);
+				o.util.Ajax.loadScript(scriptSrc);
+			}
+		}
+		var moduleS = moduleNameorModuleNames;
+		if(O.isArray(moduleS)){
+			for(var i = 0; i < moduleS.length; i++){
+				loadOneModule(moduleS[i]);
+			}
+		}else if(O.isString(moduleS)){
+			loadOneModule(moduleS);
+		}
 	};
 	
 	O.create = function(moduleName, clsBodyOrCfg, cfg){
@@ -536,7 +548,7 @@ var O = {};
 							success(prepareResponse(xhr, type));
 					}else{
 						if(O.isFunction(failure))
-							failure(prepareResponse(xhr, type));
+							failure(prepareResponse(xhr, type), xhr);
 					}
 				}
 			};
@@ -581,7 +593,11 @@ var O = {};
 						}
 					}
 				},
-				failure : function(failureText){	}
+				failure : function(failureText, xhr){
+					if(xhr.status >= 400 && xhr.status < 500){
+						o.io.Logger.error('Not found this {0} src file [load error]'.formatValue(jsSrc));
+					}
+				}
 			});
 		};
 		
