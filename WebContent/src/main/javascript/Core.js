@@ -104,6 +104,14 @@ var O = {};
 		return typeof(inData) === "string";
 	};
 	
+	O.isNumber = function(inData){
+		return typeof(inData) === "number";
+	};
+	
+	O.isDate = function(inData){
+		return inData && inData.constructor == Date;
+	};
+	
 	O.isArray = function(inObj){
 		return inObj && inObj.constructor == Array;
 	};
@@ -127,9 +135,9 @@ var O = {};
 	O.registNewError = function(errorCode, msgStrObj){
 		var errFmtStr = EXCEPTION_MSG_MAP[errorCode];
 		if(errFmtStr)
-			return false;
+			return O;
 		EXCEPTION_MSG_MAP[errorCode] = msgStrObj;
-		return true;
+		return O;
 	};
 	
 	O.getRegistType = function(typeFullName){
@@ -413,6 +421,7 @@ var O = {};
 		}else if(O.isString(moduleS)){
 			loadOneModule(moduleS);
 		}
+		return O;
 	};
 	
 	O.create = function(moduleName, clsBodyOrCfg, cfg){
@@ -476,7 +485,7 @@ var O = {};
 	O.Class({
 		pkg : 'o.util'
 	}, "Ajax", function(){
-		O.registNewError('AJAX.001', {
+		O.registNewError('AJAX_001', {
 			cn : '您的浏览器可能过于陈旧了，不支持 AJAX 功能哦，建议使用现代浏览器以改善您的使用体验，例如 Chrome',
 			en : 'Your Internet Brownser dos\'t surpport AJAX. '
 		});
@@ -493,7 +502,7 @@ var O = {};
 				};
 				return createXHR();
 			}else{
-				throw O.createError('AJAX.001');
+				throw O.createError('AJAX_001');
 			}
 		}
 		

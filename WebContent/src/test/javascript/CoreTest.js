@@ -125,24 +125,33 @@
 	O.init({
 		classPath : '../../../main/javascript'
 	});
-	O.importModule(['o.data.IStore', 'o.data.IStore']);
+	O.importModule(['o.data.IStore', 'o.data.impl.Store', 'o.data.impl.Model']);
 	
-	O.create('o.data.IStore', function(){
-		var me = this;
-		
-		me.getCount = function(){};
-		
-		me.getAt = function(){};
-		
-		me.removeAt = function(){};
-		
-		me.add  = function(){};
-		
-		me.clear = function(){};
-		
-		me.load = function(){};
-		
-		me.init = function(){};
-	})
-//	o.util.Ajax.loadScript('../../javascript/DemoClass.js');
+	var arr = O.create('o.data.impl.Store', {
+		fields : [{
+			name : 'userName', forced : true
+		},{
+			name : 'age', type : 'number', forced : true, defaultValue : 20
+		},{
+			name : 'address'
+		}]
+	});
+	
+	arr.add({
+		userName : 'Wangxh',
+		age : 12
+	}).add({
+		userName : 'SpiderMan',
+		age : 12
+	}).add({
+		userName : 'HelloWorld'
+	});
+	
+	alert(arr.getCount());
+	
+	alert(arr.getAt(0).userName);
+	alert(arr.getAt(1).userName);
+	arr.removeAt(1);
+	alert(arr.getCount());
+	alert(arr.getAt(1).userName);
 })();
