@@ -125,7 +125,7 @@
 	O.init({
 		classPath : '../../../main/javascript'
 	});
-	O.importModule(['o.data.IStore', 'o.data.impl.Store', 'o.data.impl.Model']);
+	O.importModule(['o.data.impl.Store']);
 	
 	var arr = O.create('o.data.impl.Store', {
 		fields : [{
@@ -137,21 +137,31 @@
 		}]
 	});
 	
-	arr.add({
+	arr.on('beforeAdd', function(evt){
+		alert(1111);
+	});
+	
+	var tmpO = {
 		userName : 'Wangxh',
 		age : 12
-	}).add({
+	};
+	
+	arr.add({
 		userName : 'SpiderMan',
 		age : 12
 	}).add({
 		userName : 'HelloWorld'
-	});
+	}).add(tmpO);
+	alert(arr.contains(tmpO));
 	
-	alert(arr.getCount());
+	arr.foreach(function(store, record, indexI){
+		alert(record.userName + ", " + indexI + ", " + store.getCount());
+	});
+	/*alert(arr.getCount());
 	
 	alert(arr.getAt(0).userName);
 	alert(arr.getAt(1).userName);
 	arr.removeAt(1);
 	alert(arr.getCount());
-	alert(arr.getAt(1).userName);
+	alert(arr.getAt(1).userName);*/
 })();

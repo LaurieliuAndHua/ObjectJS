@@ -230,6 +230,11 @@ var O = {};
 		return nmSp;
 	}
 	
+	O.checkInit = function(args){
+		var flagObj = args[1];
+		return  (flagObj && flagObj.chkIntfc) ?  false :  true;
+	};
+	
 	/**
 	 * 克隆方法，对于普通的对象可以实现 deepClone， 
 	 * 但对于 Object JS 框架定义的类的对象，不能克隆其私有属性的内存空间，
@@ -272,6 +277,12 @@ var O = {};
 		}
 		return unimplMethods;
 	}
+	
+	O.extend = function(desObj, resObj){
+		for(var p in resObj){
+			desObj[p] = resObj[p];
+		}
+	};
 	
 	/**
 	 * 为类自动生成一个 getter 访问器方法。将会为 targetObj 增加一个以参数 p 为参考的 get 方法，
@@ -319,12 +330,12 @@ var O = {};
 		var pkg = preCfg.pkg;
 		var nmSp = preTypeDefineConfig(pkg, name);
 		var typeName = name;
-		if(pkg)
+		if(pkg){
 			typeName = pkg + "." + name;
-		
-		if(! O.isFunction(clsBody))
+		}
+		if(! O.isFunction(clsBody)){
 			throw O.createError("SYS_DEFINE_000007", typeName);
-		
+		}
 		nmSp[name] = function(objCfg){
 			var me = this;
 			if(extend && O.isString(extend)){

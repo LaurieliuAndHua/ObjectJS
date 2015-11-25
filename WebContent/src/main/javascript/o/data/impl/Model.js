@@ -76,8 +76,6 @@ O.Class({
 	}
 	
 	function init(cfg){
-		if( !cfg )
-			return;
 		mFields = new Array();
 		var fields = cfg['fields'];
 		if(! O.isArray(fields))
@@ -88,5 +86,8 @@ O.Class({
 			mFields[i] = fieldCfg;
 		}
 	};
+	
+	if(! config)
+		return;
 	init(config);
 });

@@ -1,5 +1,5 @@
 O.Interface({
 	pkg : 'o.event',
-	name : '',
-	methods : []
+	name : 'IEvent',
+	methods : ['getTarget', 'getNativeEvent', 'getName', 'init']
 });
