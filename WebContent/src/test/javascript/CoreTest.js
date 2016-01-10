@@ -125,7 +125,33 @@
 	O.init({
 		classPath : '../../../main/javascript'
 	});
-	O.importModule(['o.data.impl.Store']);
+	
+	O.importModule(['o.data.impl.Model']);
+	var data = O.create('o.data.impl.Model', {
+		fields : [{
+			name : 'userName'
+		},{
+			name : 'userAge'
+		}]
+	});
+	
+	data.on('set', function(event, extArgs){
+		alert(extArgs.name);
+		alert(extArgs.value);
+		alert(extArgs.oldValue);
+	});
+	
+	var evtMgr = O.create('o.event.impl.EventMgrUtil', {
+		target : window,
+		eventNames : ['change']
+	});
+	
+	evtMgr.on('change', function(){
+	});
+	
+	evtMgr.fire('change');
+	data.set('userName', 'wangxh');
+	/*O.importModule(['o.data.impl.Store']);
 	
 	var arr = O.create('o.data.impl.Store', {
 		fields : [{
@@ -156,7 +182,7 @@
 	
 	arr.foreach(function(store, record, indexI){
 		alert(record.userName + ", " + indexI + ", " + store.getCount());
-	});
+	});*/
 	/*alert(arr.getCount());
 	
 	alert(arr.getAt(0).userName);

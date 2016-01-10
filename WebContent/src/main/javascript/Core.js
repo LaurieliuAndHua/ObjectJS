@@ -31,11 +31,11 @@ var O = {};
 			en : 'This type is undefined ({0}). '
 		},
 		'SYS_DEFINE_000007' : {
-			cn : '类的定义体必须是类，急救室 Function 对象。 {0}',
+			cn : '类的定义体必须是类，即就是 Function 对象。 {0}',
 			en : 'Class body must be Function\'s object. {0}'
 		},
 		'SYS_DEFINE_000008' : {
-			cn : '父类必须是类类型，急救室 Function 类型，不得是其他类型。 extend : {0}',
+			cn : '父类必须是类类型，即就是 Function 类型，不得是其他类型。 extend : {0}',
 			en : 'Parent class must be Function type. extend :{0}'
 		},
 		'SYS_DEFINE_000009' : {
@@ -87,7 +87,7 @@ var O = {};
 	
 	O.init = function(config){
 		var cfg = config || {};
-		sClassPath = cfg.classPath;
+		sClassPath = cfg.classPath || "";
 		sLanguage = cfg.language || 'cn';
 	};
 	
@@ -140,6 +140,10 @@ var O = {};
 		return O;
 	};
 	
+	/*
+	 * getRegistType
+	 * 根据全名称获取已定义类型
+	 */
 	O.getRegistType = function(typeFullName){
 		var array = typeFullName.split(".");
 		var nmspObj = sTopObj;
@@ -158,6 +162,10 @@ var O = {};
 		return obj.isIntfc === true;
 	};
 	
+	/*
+	 * getInfcInheritStack
+	 * 获取接口继承栈
+	 */
 	function getInfcInheritStack(intfc){
 		if(O.isString(intfc))
 			intfc = O.getRegistType(intfc);
@@ -177,7 +185,7 @@ var O = {};
 	O.Interface = function(config){
 		var cfg = config || {};
 		var pkg = cfg.pkg;
-		var extend = cfg.extend;
+		var extend = cfg.extend; //parent interface
 		var name = cfg.name;
 		var methods = cfg.methods;
 		var nmSp = preTypeDefineConfig(pkg, name);

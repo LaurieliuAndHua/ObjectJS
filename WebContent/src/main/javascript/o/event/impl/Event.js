@@ -15,15 +15,15 @@ O.Class({
 	};
 	
 	me.getName = function(){
-		
+		return mName;
 	};
 	
 	me.getTarget = function(){
-		
+		return mTarget;
 	};
 	
 	me.getNativeEvent = function(){
-		
+		return mNativeEvent;
 	};
 	
 	if(! config)
